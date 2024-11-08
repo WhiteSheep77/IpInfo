@@ -18,11 +18,12 @@ type IPInfo struct {
 	Timezone string `json:"timezone"`
 }
 
-func IptoArea(ip string, token string) (res IPInfo, err error) {
+func IptoArea(ip string, token string) (res IPInfo, reserr error) {
 	url := fmt.Sprintf("https://ipinfo.io/%s?token=%s", ip, token)
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatalf("Failed to make request: %v", err)
+		return res, err
 	} else {
 		defer resp.Body.Close()
 	}
@@ -31,16 +32,8 @@ func IptoArea(ip string, token string) (res IPInfo, err error) {
 	var info IPInfo
 	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
 		log.Fatalf("Failed to decode JSON: %v", err)
+		return res, err
 	}
 
-	// 顯示結果
-	fmt.Printf("IP: %s\n", info.IP)
-	fmt.Printf("City: %s\n", info.City)
-	fmt.Printf("Region: %s\n", info.Region)
-	fmt.Printf("Country: %s\n", info.Country)
-	fmt.Printf("Location: %s\n", info.Loc)
-	fmt.Printf("Org: %s\n", info.Org)
-	fmt.Printf("Timezone: %s\n", info.Timezone)
-
-	return
+	return info, err
 }
