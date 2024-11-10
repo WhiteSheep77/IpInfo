@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 // IPInfo 結構對應 API 回傳的 JSON 格式
@@ -18,6 +20,8 @@ type IPInfo struct {
 	Loc      string `json:"loc"` // 經緯度，例如 "37.3860,-122.0838"
 	Org      string `json:"org"`
 	Timezone string `json:"timezone"`
+	LocX     float64
+	LocY     float64
 }
 
 func IptoArea(ip string, token string) (res IPInfo, ResbodyBytes string, reserr error) {
@@ -44,6 +48,27 @@ func IptoArea(ip string, token string) (res IPInfo, ResbodyBytes string, reserr 
 		return res, string(bodyBytes), errors.New(string(bodyBytes))
 	}
 
+	res.LocX, res.LocY, _ = convertLocation(res.Loc)
+
 	return res, string(bodyBytes), errUn
 
+}
+
+func convertLocation(location string) (float64, float64, error) {
+	coords := strings.Split(location, ",")
+	if len(coords) != 2 {
+		return 0, 0, fmt.Errorf("invalid location format")
+	}
+
+	locx, err := strconv.ParseFloat(strings.TrimSpace(coords[0]), 64)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	locy, err := strconv.ParseFloat(strings.TrimSpace(coords[1]), 64)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return locx, locy, nil
 }
