@@ -41,7 +41,7 @@ func IptoArea(ip string, token string) (res IPInfo, ResbodyBytes string, reserr 
 	errUn := json.Unmarshal(bodyBytes, &res)
 
 	if "" == res.IP && "" == res.City {
-		return res, string(bodyBytes), errors.New(string(bodyBytes)
+		return res, string(bodyBytes), errors.New(string(bodyBytes))
 	}
 
 	return res, string(bodyBytes), errUn
